@@ -52,3 +52,17 @@ public interface IRefIndexable<in TIndex, TResult> : IIndexable<TIndex, TResult>
         set => this[index] = value;
     }
 }
+
+public interface ICopyable<in TDestination>
+    where TDestination : allows ref struct
+{
+    public void CopyTo(scoped TDestination destination);
+    public bool TryCopyTo(scoped TDestination destination);
+}
+public interface ICopyable<in TDestination, in TIndex> : ICopyable<TDestination>
+    where TDestination : allows ref struct
+    where TIndex : allows ref struct
+{
+    public void CopyTo(scoped TDestination destination, scoped TIndex index);
+    public bool TryCopyTo(scoped TDestination destination, scoped TIndex index);
+}
