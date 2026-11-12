@@ -1,0 +1,56 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>SpeartonCS.ExtendedGenerics</Title>
+    <Authors>SpeartonCS</Authors>
+    <Description>Generic constaints and features that are not yet represented in .NET 10</Description>
+    <PackageTags>dotnet;net;10;net10;generics;safe;constraint;extended;ext;feature</PackageTags>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <IsAotCompatible>True</IsAotCompatible>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <IsAotCompatible>True</IsAotCompatible>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Numerics\_Operators\" />
+    <Folder Include="Runtime\CompilerServices\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="IFactory.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>IFactory.tt</DependentUpon>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="IFactory.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>IFactory.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="IFactory.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>IFactory.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="LiveTester/LiveTester.csproj" />
+  <Project Path="SpeartonCS.ExtendedGenerics/SpeartonCS.ExtendedGenerics.csproj" />
+</Solution>
