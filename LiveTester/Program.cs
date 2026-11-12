@@ -1,6 +1,4 @@
-﻿using SpeartonCS.ExtendedGenerics.Numerics;
-
-namespace LiveTester;
+﻿namespace LiveTester;
 
 internal class Program
 {

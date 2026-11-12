@@ -23,6 +23,13 @@ public interface IReadOnlyIndexable<in TIndex, out TResult>
 {
     public TResult this[TIndex index] { get; }
 }
+public interface IReadOnlyRefIndexable<in TIndex, TResult> : IReadOnlyIndexable<TIndex, TResult>
+    where TIndex : allows ref struct
+    where TResult : allows ref struct
+{
+    public new ref readonly TResult this[TIndex index] { get; }
+    TResult IReadOnlyIndexable<TIndex, TResult>.this[TIndex index] => this[index];
+}
 
 public interface IIndexable<in TIndex, TResult> : IReadOnlyIndexable<TIndex, TResult>
     where TIndex : allows ref struct
@@ -30,4 +37,18 @@ public interface IIndexable<in TIndex, TResult> : IReadOnlyIndexable<TIndex, TRe
 {
     public new TResult this[TIndex index] { get; set; }
     TResult IReadOnlyIndexable<TIndex, TResult>.this[TIndex index] => this[index];
+}
+
+public interface IRefIndexable<in TIndex, TResult> : IIndexable<TIndex, TResult>, IReadOnlyRefIndexable<TIndex, TResult>
+    where TIndex : allows ref struct
+    where TResult : allows ref struct
+{
+    public new ref TResult this[TIndex index] { get; }
+    TResult IReadOnlyIndexable<TIndex, TResult>.this[TIndex index] => this[index];
+    ref readonly TResult IReadOnlyRefIndexable<TIndex, TResult>.this[TIndex index] => ref this[index];
+    TResult IIndexable<TIndex, TResult>.this[TIndex index]
+    {
+        get => this[index];
+        set => this[index] = value;
+    }
 }
