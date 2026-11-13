@@ -83,7 +83,7 @@ public interface IReadOnlyList<TElement, out TCount, out TEnumerator, TIndex>
 }
 
 public interface IList<TElement, TCount, out TEnumerator, TIndex>
-    : IReadOnlyList<TElement, TCount, TEnumerator, TIndex>, ICollection<TElement, TCount, TEnumerator, TIndex>, IClearable
+    : IReadOnlyList<TElement, TCount, TEnumerator, TIndex>, ICollection<TElement, TCount, TEnumerator, TIndex>
 
     where TElement : allows ref struct
     where TCount : allows ref struct
@@ -279,27 +279,18 @@ public interface IReadOnlyDictionary<TKey, TValue, out TCount, out TEnumerator>
     where TCount : allows ref struct
     where TEnumerator : IEnumerator<TKey>, allows ref struct;
 
-public interface IReadOnlyDictionary<TKey, TValue, out TCount, out TEnumerator, out TValueEnumerable>
+public interface IReadOnlyDictionary<TKey, TValue, out TCount, out TEnumerator, out TValueEnumerable, out TValueEnumerator>
     : IReadOnlyDictionary<TKey, TValue, TCount, TEnumerator>
 
     where TKey : allows ref struct
     where TValue : allows ref struct
     where TCount : allows ref struct
     where TEnumerator : IEnumerator<TKey>, allows ref struct
-    where TValueEnumerable : IEnumerable<TValue>, allows ref struct
-{
-    public TValueEnumerable GetValueEnumerable();
-}
-
-public interface IReadOnlyDictionary<TKey, TValue, out TCount, out TEnumerator, out TValueEnumerable, out TValueEnumerator>
-    : IReadOnlyDictionary<TKey, TValue, TCount, TEnumerator, TValueEnumerable>
-
-    where TKey : allows ref struct
-    where TValue : allows ref struct
-    where TCount : allows ref struct
-    where TEnumerator : IEnumerator<TKey>, allows ref struct
     where TValueEnumerable : IEnumerable<TValue, TValueEnumerator>, allows ref struct
-    where TValueEnumerator : IEnumerator<TValue>, allows ref struct;
+    where TValueEnumerator : IEnumerator<TValue>, allows ref struct
+{
+    public new TValueEnumerable GetValueEnumerable();
+}
 
 public interface IDictionary<TKey, TValue, TCount>
     : IReadOnlyDictionary<TKey, TValue, TCount>, ICollection<TKey, TCount>, IIndexable<TKey, TValue>
@@ -321,12 +312,12 @@ public interface IDictionary<TKey, TValue, TCount>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     bool ICollection<TKey, TCount>.TryRemove(scoped TKey element) => TryRemoveKey(element);
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    bool ICollection<TKey, TCount>.TryRemoveAll(scoped TKey element) => false;
+    bool ICollection<TKey, TCount>.TryRemoveAll(scoped TKey element) => TryRemoveKey(element);
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     bool ICollection<TKey, TCount>.TryRemoveAll(scoped TKey element, [MaybeNullWhen(false)] out TCount? allCount, [MaybeNullWhen(false)] out TCount? removedCount)
     {
         allCount = removedCount = default;
-        return false;
+        return TryRemoveKey(element);
     }
 }
 
@@ -338,17 +329,8 @@ public interface IDictionary<TKey, TValue, TCount, out TEnumerator>
     where TCount : allows ref struct
     where TEnumerator : IEnumerator<TKey>, allows ref struct;
 
-public interface IDictionary<TKey, TValue, TCount, out TEnumerator, out TValueEnumerable>
-    : IDictionary<TKey, TValue, TCount, TEnumerator>, IReadOnlyDictionary<TKey, TValue, TCount, TEnumerator, TValueEnumerable>
-
-    where TKey : allows ref struct
-    where TValue : allows ref struct
-    where TCount : allows ref struct
-    where TEnumerator : IEnumerator<TKey>, allows ref struct
-    where TValueEnumerable : IEnumerable<TValue>, allows ref struct;
-
 public interface IDictionary<TKey, TValue, TCount, out TEnumerator, out TValueEnumerable, out TValueEnumerator>
-    : IDictionary<TKey, TValue, TCount, TEnumerator, TValueEnumerable>, IReadOnlyDictionary<TKey, TValue, TCount, TEnumerator, TValueEnumerable, TValueEnumerator>
+    : IDictionary<TKey, TValue, TCount, TEnumerator>, IReadOnlyDictionary<TKey, TValue, TCount, TEnumerator, TValueEnumerable, TValueEnumerator>
 
     where TKey : allows ref struct
     where TValue : allows ref struct
@@ -360,5 +342,103 @@ public interface IDictionary<TKey, TValue, TCount, out TEnumerator, out TValueEn
 #endregion
 
 #region Map
+
+public interface IReadOnlyMap<TKey, TValue, out TCount>
+    : IReadOnlyDictionary<TKey, TValue, TCount>
+
+    where TKey : allows ref struct
+    where TValue : allows ref struct
+    where TCount : allows ref struct
+{
+    public IReadOnlyMap<TValue, TKey, TCount> AsValueKeyMap();
+}
+
+public interface IReadOnlyMap<TKey, TValue, out TCount, out TEnumerator>
+    : IReadOnlyMap<TKey, TValue, TCount>, IReadOnlyDictionary<TKey, TValue, TCount, TEnumerator>
+    
+    where TKey : allows ref struct
+    where TValue : allows ref struct
+    where TCount : allows ref struct
+    where TEnumerator : IEnumerator<TKey>, allows ref struct;
+
+public interface IReadOnlyMap<TKey, TValue, out TCount, out TEnumerator, out TValueEnumerable, out TValueEnumerator>
+    : IReadOnlyMap<TKey, TValue, TCount, TEnumerator>, IReadOnlyDictionary<TKey, TValue, TCount, TEnumerator, TValueEnumerable, TValueEnumerator>
+
+    where TKey : allows ref struct
+    where TValue : allows ref struct
+    where TCount : allows ref struct
+    where TEnumerator : IEnumerator<TKey>, allows ref struct
+    where TValueEnumerable : IEnumerable<TValue, TValueEnumerator>, allows ref struct
+    where TValueEnumerator : IEnumerator<TValue>, allows ref struct
+{
+    public new IReadOnlyMap<TValue, TKey, TCount, TValueEnumerator> AsValueKeyMap();
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    IReadOnlyMap<TValue, TKey, TCount> IReadOnlyMap<TKey, TValue, TCount>.AsValueKeyMap() => AsValueKeyMap();
+}
+
+public interface IReadOnlyMap<TKey, TValue, out TCount, out TEnumerator, out TValueEnumerable, out TValueEnumerator, out TValueKeyMap>
+    : IReadOnlyMap<TKey, TValue, TCount, TEnumerator, TValueEnumerable, TValueEnumerator>, IReadOnlyDictionary<TKey, TValue, TCount, TEnumerator, TValueEnumerable, TValueEnumerator>
+
+    where TKey : allows ref struct
+    where TValue : allows ref struct
+    where TCount : allows ref struct
+    where TEnumerator : IEnumerator<TKey>, allows ref struct
+    where TValueEnumerable : IEnumerable<TValue, TValueEnumerator>, allows ref struct
+    where TValueEnumerator : IEnumerator<TValue>, allows ref struct
+    where TValueKeyMap : IReadOnlyMap<TValue, TKey, TCount, TValueEnumerator>, allows ref struct
+{
+    public new TValueKeyMap AsValueKeyMap();
+}
+
+public interface IMap<TKey, TValue, TCount>
+    : IReadOnlyMap<TKey, TValue, TCount>, IDictionary<TKey, TValue, TCount>
+
+    where TKey : allows ref struct
+    where TValue : allows ref struct
+    where TCount : allows ref struct
+{
+    public bool TryRemoveValue(scoped TValue value);
+    public bool TryRemoveValue(scoped TValue value, [MaybeNullWhen(false)] out TKey? key);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    bool IDictionary<TKey, TValue, TCount>.TryRemoveKeysByValue(scoped TValue value) => TryRemoveValue(value);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    bool IDictionary<TKey, TValue, TCount>.TryRemoveKeysByValue(scoped TValue value, [MaybeNullWhen(false)] out TCount? allCount, [MaybeNullWhen(false)] out TCount? removedCount)
+    {
+        allCount = removedCount = default;
+        return TryRemoveValue(value);
+    }
+}
+
+public interface IMap<TKey, TValue, TCount, out TEnumerator>
+    : IMap<TKey, TValue, TCount>, IReadOnlyMap<TKey, TValue, TCount, TEnumerator>, IDictionary<TKey, TValue, TCount, TEnumerator>
+
+    where TKey : allows ref struct
+    where TValue : allows ref struct
+    where TCount : allows ref struct
+    where TEnumerator : IEnumerator<TKey>, allows ref struct;
+
+public interface IMap<TKey, TValue, TCount, out TEnumerator, out TValueEnumerable, out TValueEnumerator>
+    : IMap<TKey, TValue, TCount, TEnumerator>, IReadOnlyMap<TKey, TValue, TCount, TEnumerator, TValueEnumerable, TValueEnumerator>,
+    IDictionary<TKey, TValue, TCount, TEnumerator, TValueEnumerable, TValueEnumerator>
+
+    where TKey : allows ref struct
+    where TValue : allows ref struct
+    where TCount : allows ref struct
+    where TEnumerator : IEnumerator<TKey>, allows ref struct
+    where TValueEnumerable : IEnumerable<TValue, TValueEnumerator>, allows ref struct
+    where TValueEnumerator : IEnumerator<TValue>, allows ref struct;
+
+public interface IMap<TKey, TValue, TCount, out TEnumerator, out TValueEnumerable, out TValueEnumerator, out TValueKeyMap>
+    : IMap<TKey, TValue, TCount, TEnumerator, TValueEnumerable, TValueEnumerator>, IReadOnlyMap<TKey, TValue, TCount, TEnumerator, TValueEnumerable, TValueEnumerator, TValueKeyMap>,
+    IDictionary<TKey, TValue, TCount, TEnumerator, TValueEnumerable, TValueEnumerator>
+
+    where TKey : allows ref struct
+    where TValue : allows ref struct
+    where TCount : allows ref struct
+    where TEnumerator : IEnumerator<TKey>, allows ref struct
+    where TValueEnumerable : IEnumerable<TValue, TValueEnumerator>, allows ref struct
+    where TValueEnumerator : IEnumerator<TValue>, allows ref struct
+    where TValueKeyMap : IMap<TValue, TKey, TCount, TValueEnumerator>, allows ref struct;
 
 #endregion
