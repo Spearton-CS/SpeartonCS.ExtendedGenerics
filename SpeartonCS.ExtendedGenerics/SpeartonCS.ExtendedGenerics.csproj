@@ -30,10 +30,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Numerics\_Operators\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="..\LICENSE.txt">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
@@ -41,11 +37,6 @@
     <None Include="..\README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
-    </None>
-    <None Include="IDeconstructible.cs">
-      <DependentUpon>IDeconstructible.tt</DependentUpon>
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
     </None>
     <None Include="IFactory.cs">
       <DesignTime>True</DesignTime>
@@ -55,7 +46,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="IDeconstructible.tt">
+    <None Update="DuckTyping\IDeconstructible.tt">
       <LastGenOutput>IDeconstructible.cs</LastGenOutput>
       <Generator>TextTemplatingFileGenerator</Generator>
     </None>
@@ -70,7 +61,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="IDeconstructible.cs">
+    <Compile Update="DuckTyping\IDeconstructible.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>IDeconstructible.tt</DependentUpon>

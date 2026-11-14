@@ -1,4 +1,7 @@
-﻿namespace SpeartonCS.ExtendedGenerics.Collections;
+﻿using System.Collections;
+using System.Runtime.CompilerServices;
+
+namespace SpeartonCS.ExtendedGenerics.Collections;
 
 public interface IResetable
 {
@@ -10,12 +13,7 @@ public interface IClearable
     public void Clear();
 }
 
-public interface IEnumerable<out T, out TEnumerator> : IEnumerable<T>
-    where T : allows ref struct
-    where TEnumerator : IEnumerator<T>, allows ref struct
-{
-    public new TEnumerator GetEnumerator();
-}
+#region Indexable
 
 public interface IReadOnlyIndexable<in TIndex, out TResult>
     where TIndex : allows ref struct
@@ -53,6 +51,8 @@ public interface IRefIndexable<in TIndex, TResult> : IIndexable<TIndex, TResult>
     }
 }
 
+#endregion
+
 public interface ICopyable<in TDestination>
     where TDestination : allows ref struct
 {
@@ -65,4 +65,12 @@ public interface ICopyable<in TDestination, in TIndex> : ICopyable<TDestination>
 {
     public void CopyTo(scoped TDestination destination, scoped TIndex index);
     public bool TryCopyTo(scoped TDestination destination, scoped TIndex index);
+}
+
+public interface ISliceable<out TSlice, in TIndex, in TLength>
+    where TSlice : allows ref struct
+    where TIndex : allows ref struct
+    where TLength : allows ref struct
+{
+    public TSlice Slice(scoped TIndex index, scoped TLength length);
 }

@@ -96,6 +96,179 @@ public interface IList<TElement, TCount, out TEnumerator, TIndex>
 
 #endregion
 
+#region LinkedList
+
+#region Nodes
+
+public interface IReadOnlyLinkedNode<TElement>
+    where TElement : allows ref struct
+{
+    public TElement Value { get; }
+
+    public bool TryGetPrevious([MaybeNullWhen(false)] out IReadOnlyLinkedNode<TElement>? prev);
+    public bool TryGetNext([MaybeNullWhen(false)] out IReadOnlyLinkedNode<TElement>? prev);
+}
+
+public interface IReadOnlyLinkedNode<TSelf, TElement>
+    : IReadOnlyLinkedNode<TElement>
+
+    where TSelf : IReadOnlyLinkedNode<TSelf, TElement>, allows ref struct
+    where TElement : allows ref struct
+{
+    public bool TryGetPrevious([MaybeNullWhen(false)] out TSelf? prev);
+    public bool TryGetNext([MaybeNullWhen(false)] out TSelf? prev);
+}
+
+public interface ILinkedNode<TElement>
+    : IReadOnlyLinkedNode<TElement>
+
+    where TElement : allows ref struct
+{
+    public TElement Value { get; set; }
+
+    public bool TryGetPrevious([MaybeNullWhen(false)] out ILinkedNode<TElement>? prev);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    bool IReadOnlyLinkedNode<TElement>.TryGetPrevious(out IReadOnlyLinkedNode<TElement>? prev) => TryGetPrevious(out prev);
+    public bool TrySetPrevious([MaybeNull] ILinkedNode<TElement>? prev);
+    public bool TrySetPrevious([MaybeNull] ILinkedNode<TElement>? prev, [MaybeNullWhen(false)] out ILinkedNode<TElement>? old);
+    public bool TryRemovePrevious();
+
+    public bool TryGetNext([MaybeNullWhen(false)] out ILinkedNode<TElement>? prev);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    bool IReadOnlyLinkedNode<TElement>.TryGetNext(out IReadOnlyLinkedNode<TElement>? next) => TryGetNext(out next);
+    public bool TrySetNext([MaybeNull] ILinkedNode<TElement>? next);
+    public bool TrySetNext([MaybeNull] ILinkedNode<TElement>? next, [MaybeNullWhen(false)] out ILinkedNode<TElement>? old);
+    public bool TryRemoveNext();
+
+    public bool TryMoveAfter(ILinkedNode<TElement> after);
+    public bool TryMoveBefore(ILinkedNode<TElement> before);
+}
+
+public interface ILinkedNode<TSelf, TElement>
+    : ILinkedNode<TElement>, IReadOnlyLinkedNode<TSelf, TElement>
+
+    where TSelf : ILinkedNode<TSelf, TElement>, allows ref struct
+    where TElement : allows ref struct
+{
+    public new bool TrySetPrevious([MaybeNull] scoped TSelf? prev);
+    public new bool TrySetPrevious([MaybeNull] scoped TSelf? prev, [MaybeNullWhen(false)] out TSelf? old);
+
+    public new bool TrySetNext([MaybeNull] scoped TSelf? next);
+    public new bool TrySetNext([MaybeNull] scoped TSelf? next, [MaybeNullWhen(false)] out TSelf? old);
+
+    public new bool TryMoveAfter(scoped TSelf after);
+    public new bool TryMoveBefore(scoped TSelf before);
+}
+
+#endregion
+
+#region Lists
+
+public interface IReadOnlyLinkedList<TElement, out TCount>
+    : IReadOnlyCollection<TElement, TCount>
+
+    where TElement : allows ref struct
+    where TCount : allows ref struct
+{
+    public bool IsDoubleLinked { get; }
+    /// <summary>
+    /// When IsDoubleLinked is <see langword="false"/>,
+    /// IsForwardDirected <see langword="true"/> means that Node.TryGetNext() probably returns true, otherwise - Node.TryGetPrevious.
+    /// </summary>
+    public bool IsForwardDirected { get; }
+
+    public IReadOnlyLinkedNode<TElement> FirstNode { get; }
+    public bool TryGetLastNode([MaybeNullWhen(false)] out IReadOnlyLinkedNode<TElement>? last);
+
+    public bool TryNodeOf(scoped TElement element, [MaybeNullWhen(false)] out IReadOnlyLinkedNode<TElement>? node);
+}
+
+public interface IReadOnlyLinkedList<TElement, out TCount, out TEnumerator>
+    : IReadOnlyLinkedList<TElement, TCount>, IReadOnlyCollection<TElement, TCount, TEnumerator>
+    
+    where TElement : allows ref struct
+    where TCount : allows ref struct
+    where TEnumerator : IEnumerator<TElement>, allows ref struct;
+
+public interface IReadOnlyLinkedList<TElement, out TCount, out TEnumerator, TNode>
+    : IReadOnlyLinkedList<TElement, TCount, TEnumerator>
+
+    where TElement : allows ref struct
+    where TCount : allows ref struct
+    where TEnumerator : IEnumerator<TElement>, allows ref struct
+    where TNode : IReadOnlyLinkedNode<TNode, TElement>, allows ref struct
+{
+    public new TNode FirstNode { get; }
+    public new bool TryGetLastNode([MaybeNullWhen(false)] out TNode? last);
+
+    public new bool TryNodeOf(scoped TElement element, [MaybeNullWhen(false)] out TNode? node);
+}
+
+public interface ILinkedList<TElement, TCount>
+    : IReadOnlyLinkedList<TElement, TCount>, ICollection<TElement, TCount>
+
+    where TElement : allows ref struct
+    where TCount : allows ref struct
+{
+    public new ILinkedNode<TElement> FirstNode { get; }
+    IReadOnlyLinkedNode<TElement> IReadOnlyLinkedList<TElement, TCount>.FirstNode
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => FirstNode;
+    }
+    public new bool TryGetLastNode([MaybeNullWhen(false)] out ILinkedNode<TElement>? last);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    bool IReadOnlyLinkedList<TElement, TCount>.TryGetLastNode([MaybeNullWhen(false)] out IReadOnlyLinkedNode<TElement>? last) => TryGetLastNode(out last);
+
+    public new bool TryNodeOf(scoped TElement element, [MaybeNullWhen(false)] out ILinkedNode<TElement>? node);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    bool IReadOnlyLinkedList<TElement, TCount>.TryNodeOf(scoped TElement element, [MaybeNullWhen(false)] out IReadOnlyLinkedNode<TElement>? node) => TryNodeOf(element, out node);
+
+    public bool TryAdd(scoped TElement value, [MaybeNullWhen(false)] out ILinkedNode<TElement>? node);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    bool ICollection<TElement, TCount>.TryAdd(scoped TElement element) => TryAdd(element, out _);
+
+    public bool TryRemove(scoped TElement value, [MaybeNullWhen(false)] out ILinkedNode<TElement>? node);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    bool ICollection<TElement, TCount>.TryRemove(scoped TElement element) => TryRemove(element, out _);
+    public bool TryRemove(ILinkedNode<TElement> node);
+    public bool TryRemove(ILinkedNode<TElement> node, [MaybeNullWhen(false)] out TElement? value);
+
+    public bool TryInsert(scoped TElement value, ILinkedNode<TElement> node, [MaybeNullWhen(false)] out ILinkedNode<TElement>? insert);
+    public bool TryMoveAfter(ILinkedNode<TElement> node, ILinkedNode<TElement> after);
+    public bool TryMoveBefore(ILinkedNode<TElement> node, ILinkedNode<TElement> before);
+}
+
+public interface ILinkedList<TElement, TCount, out TEnumerator>
+    : ILinkedList<TElement, TCount>, IReadOnlyLinkedList<TElement, TCount, TEnumerator>, ICollection<TElement, TCount, TEnumerator>
+
+    where TElement : allows ref struct
+    where TCount : allows ref struct
+    where TEnumerator : IEnumerator<TElement>, allows ref struct;
+
+public interface ILinkedList<TElement, TCount, out TEnumerator, TNode>
+    : ILinkedList<TElement, TCount, TEnumerator>, IReadOnlyLinkedList<TElement, TCount, TEnumerator, TNode>
+
+    where TElement : allows ref struct
+    where TCount : allows ref struct
+    where TEnumerator : IEnumerator<TElement>, allows ref struct
+    where TNode : ILinkedNode<TNode, TElement>, allows ref struct
+{
+    public bool TryAdd(scoped TElement value, [MaybeNullWhen(false)] out TNode? node);
+
+    public bool TryRemove(scoped TElement value, [MaybeNullWhen(false)] out TNode? node);
+    public bool TryRemove(scoped TNode node);
+    public bool TryRemove(scoped TNode node, [MaybeNullWhen(false)] out TElement? value);
+
+    public bool TryInsert(scoped TElement value, scoped TNode node, [MaybeNullWhen(false)] out TNode? insert);
+    public bool TryMoveAfter(scoped TNode node, TNode after);
+    public bool TryMoveBefore(scoped TNode node, TNode before);
+}
+
+#endregion
+
+#endregion
+
 #region ISet
 
 public interface IReadOnlySet<TKey, out TCount>

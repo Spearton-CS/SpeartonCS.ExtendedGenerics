@@ -1,4 +1,4 @@
-﻿namespace SpeartonCS.ExtendedGenerics;
+﻿namespace SpeartonCS.ExtendedGenerics.DuckTyping;
 
 
 /// <summary>
