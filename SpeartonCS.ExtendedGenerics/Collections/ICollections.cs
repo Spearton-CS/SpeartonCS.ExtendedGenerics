@@ -96,6 +96,46 @@ public interface IList<TElement, TCount, out TEnumerator, TIndex>
 
 #endregion
 
+#region ISet
+
+public interface IReadOnlySet<TKey, out TCount>
+    : IReadOnlyCollection<TKey, TCount>
+
+    where TKey : allows ref struct
+    where TCount : allows ref struct;
+
+public interface IReadOnlySet<TKey, out TCount, out TEnumerator>
+    : IReadOnlySet<TKey, TCount>, IReadOnlyCollection<TKey, TCount, TEnumerator>
+
+    where TKey : allows ref struct
+    where TCount : allows ref struct
+    where TEnumerator : IEnumerator<TKey>, allows ref struct;
+
+public interface ISet<TKey, TCount>
+    : IReadOnlySet<TKey, TCount>, ICollection<TKey, TCount>
+
+    where TKey : allows ref struct
+    where TCount : allows ref struct
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    bool ICollection<TKey, TCount>.TryRemoveAll(scoped TKey element) => TryRemove(element);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    bool ICollection<TKey, TCount>.TryRemoveAll(scoped TKey element, [MaybeNullWhen(false)] out TCount? allCount, [MaybeNullWhen(false)] out TCount? removedCount)
+    {
+        allCount = removedCount = default;
+        return TryRemove(element);
+    }
+}
+
+public interface ISet<TKey, TCount, out TEnumerator>
+    : ISet<TKey, TCount>, IReadOnlySet<TKey, TCount, TEnumerator>, ICollection<TKey, TCount, TEnumerator>
+
+    where TKey : allows ref struct
+    where TCount : allows ref struct
+    where TEnumerator : IEnumerator<TKey>, allows ref struct;
+
+#endregion
+
 #region IStack
 
 public interface IReadOnlyStack<TElement, out TCount>
@@ -191,6 +231,60 @@ public interface IQueue<TElement, TCount, out TEnumerator>
     : IQueue<TElement, TCount>, IReadOnlyQueue<TElement, TCount, TEnumerator>, ICollection<TElement, TCount, TEnumerator>
 
     where TElement : allows ref struct
+    where TCount : allows ref struct
+    where TEnumerator : IEnumerator<TElement>, allows ref struct;
+
+#endregion
+
+#region IPriorityQueue
+
+public interface IReadOnlyPriorityQueue<TElement, TPriority, out TCount>
+    : IReadOnlyCollection<TElement, TCount>
+
+    where TElement : allows ref struct
+    where TPriority : allows ref struct
+    where TCount : allows ref struct
+{
+    public bool TryPeek(scoped TPriority priority, [MaybeNullWhen(false)] out TElement? element);
+}
+
+public interface IReadOnlyPriorityQueue<TElement, TPriority, out TCount, out TEnumerator>
+    : IReadOnlyPriorityQueue<TElement, TPriority, TCount>, IReadOnlyCollection<TElement, TCount, TEnumerator>
+
+    where TElement : allows ref struct
+    where TPriority : allows ref struct
+    where TCount : allows ref struct
+    where TEnumerator : IEnumerator<TElement>, allows ref struct;
+
+public interface IPriorityQueue<TElement, TPriority, TCount>
+    : IReadOnlyPriorityQueue<TElement, TPriority, TCount>, ICollection<TElement, TCount>
+
+    where TElement : allows ref struct
+    where TPriority : allows ref struct
+    where TCount : allows ref struct
+{
+    public bool TryEnqueue(scoped TPriority priority, scoped TElement element);
+    public bool TryDequeue(scoped TPriority priority, [MaybeNullWhen(false)] out TElement? element);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    bool ICollection<TElement, TCount>.TryAdd(scoped TElement element) => false;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    bool ICollection<TElement, TCount>.TryRemove(scoped TElement element) => false;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    bool ICollection<TElement, TCount>.TryRemoveAll(scoped TElement element) => false;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    bool ICollection<TElement, TCount>.TryRemoveAll(scoped TElement element, [MaybeNullWhen(false)] out TCount? allCount, [MaybeNullWhen(false)] out TCount? removedCount)
+    {
+        allCount = removedCount = default;
+        return false;
+    }
+}
+
+public interface IPriorityQueue<TElement, TPriority, TCount, out TEnumerator>
+    : IPriorityQueue<TElement, TPriority, TCount>, IReadOnlyPriorityQueue<TElement, TPriority, TCount, TEnumerator>, ICollection<TElement, TCount, TEnumerator>
+
+    where TElement : allows ref struct
+    where TPriority : allows ref struct
     where TCount : allows ref struct
     where TEnumerator : IEnumerator<TElement>, allows ref struct;
 
