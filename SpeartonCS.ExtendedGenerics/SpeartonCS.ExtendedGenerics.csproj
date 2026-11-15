@@ -43,6 +43,11 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>IFactory.tt</DependentUpon>
     </None>
+    <None Include="Runtime\CompilerServices\DelegatePtr.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>DelegatePtr.tt</DependentUpon>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
@@ -53,6 +58,10 @@
     <None Update="IFactory.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>IFactory.cs</LastGenOutput>
+    </None>
+    <None Update="Runtime\CompilerServices\DelegatePtr.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>DelegatePtr.cs</LastGenOutput>
     </None>
   </ItemGroup>
 
@@ -70,6 +79,11 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>IFactory.tt</DependentUpon>
+    </Compile>
+    <Compile Update="Runtime\CompilerServices\DelegatePtr.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>DelegatePtr.tt</DependentUpon>
     </Compile>
   </ItemGroup>
 

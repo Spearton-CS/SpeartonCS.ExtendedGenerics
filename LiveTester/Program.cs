@@ -104,7 +104,7 @@ internal class Program
             }
         }
     }
-    
+
     record Namespace(string Name)
     {
         public readonly List<Namespace> Subnamespaces = [];

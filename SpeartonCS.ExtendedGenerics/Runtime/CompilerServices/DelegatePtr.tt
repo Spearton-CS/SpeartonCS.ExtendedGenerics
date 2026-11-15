@@ -1,0 +1,251 @@
+﻿<#@ template debug="false" hostspecific="true" language="C#" compilerOptions="/nullable:enable /langversion:latest" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
+using System.Runtime.CompilerServices;
+
+using SpeartonCS.ExtendedGenerics.Numerics;
+
+namespace SpeartonCS.ExtendedGenerics.Runtime.CompilerServices;
+<#
+string genericParams = string.Empty, delegateParams = string.Empty;
+string[] callConvs = new string[]
+{
+    "Cdecl",
+    "FastCall",
+    "MemberFunction",
+    "StdCall",
+    "SuppressGCTransition",
+    "Swift",
+    "ThisCall",
+
+    "CdeclSuppressGCTransition",
+    "FastCallSuppressGCTransition",
+    "MemberFunctionSuppressGCTransition",
+    "StdCallSuppressGCTransition",
+    "SwiftSuppressGCTransition",
+    "ThisCallSuppressGCTransition",
+};
+
+for (int i = 0; i < 16; i++)
+{
+    if (i != 0)
+    {
+        genericParams = "<";;
+        for (int j = 1; j <= i; j++)
+        {
+            genericParams += j != i ? $"T{j}, " : $"T{j}";
+            delegateParams += $"T{j}, ";
+        }
+        genericParams += ">";
+    }
+#>
+
+#region <#= i#>
+
+#region ActionPtr
+
+[DebuggerDisplay("{Value}")]
+public readonly unsafe struct ManagedActionPtr<#= genericParams#> :
+    IEquatable<ManagedActionPtr<#= genericParams#>>, IEqualityOperators<ManagedActionPtr<#= genericParams#>, ManagedActionPtr<#= genericParams#>, bool>, ITrueFalseOperators<ManagedActionPtr<#= genericParams#>>,
+
+    IZeroValue<ManagedActionPtr<#= genericParams#>>,
+
+    IExplicitOperators<ManagedActionPtr<#= genericParams#>, nuint>, IExplicitOperators<ManagedActionPtr<#= genericParams#>, nint>,
+    IExplicitOperators<ManagedActionPtr<#= genericParams#>, ulong>, IExplicitOperators<ManagedActionPtr<#= genericParams#>, long>,
+    IExplicitOperators<ManagedActionPtr<#= genericParams#>, uint>, IExplicitOperators<ManagedActionPtr<#= genericParams#>, int>
+{
+    public ManagedActionPtr(delegate* managed<<#= delegateParams#>void> value) => Value = value;
+    public readonly delegate* managed<<#= delegateParams#>void> Value;
+
+    public static ManagedActionPtr<#= genericParams#> Zero
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => new(null);
+    }
+
+    #region Equality
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public readonly override bool Equals([NotNullWhen(true)] object? obj) => obj is ManagedActionPtr<#= genericParams#> other && this == other;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public readonly bool Equals(ManagedActionPtr<#= genericParams#> other) => this == other;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public readonly override int GetHashCode() => ((nuint)Value).GetHashCode();
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator ==(ManagedActionPtr<#= genericParams#> left, ManagedActionPtr<#= genericParams#> right) => left.Value == right.Value;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator !=(ManagedActionPtr<#= genericParams#> left, ManagedActionPtr<#= genericParams#> right) => left.Value != right.Value;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator true(ManagedActionPtr<#= genericParams#> ptr) => ptr.Value is not null;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator false(ManagedActionPtr<#= genericParams#> ptr) => ptr.Value is null;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public readonly override string ToString() => ((nuint)Value).ToString();
+
+    #endregion
+
+    #region Casts
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator ManagedActionPtr<#= genericParams#>(delegate* managed<<#= delegateParams#>void> value) => new(value);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator delegate* managed<<#= delegateParams#>void>(ManagedActionPtr<#= genericParams#> ptr) => ptr.Value;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator ManagedActionPtr<#= genericParams#>(void* value) => new((delegate* managed<<#= delegateParams#>void>)value);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator void*(ManagedActionPtr<#= genericParams#> ptr) => ptr.Value;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator ManagedActionPtr<#= genericParams#>(nuint value) => (delegate* managed<<#= delegateParams#>void>)value;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator nuint(ManagedActionPtr<#= genericParams#> ptr) => (nuint)ptr.Value;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator ManagedActionPtr<#= genericParams#>(nint value) => (delegate* managed<<#= delegateParams#>void>)value;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator nint(ManagedActionPtr<#= genericParams#> ptr) => (nint)ptr.Value;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator ManagedActionPtr<#= genericParams#>(ulong value) => (delegate* managed<<#= delegateParams#>void>)value;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator ulong(ManagedActionPtr<#= genericParams#> ptr) => (ulong)ptr.Value;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator ManagedActionPtr<#= genericParams#>(long value) => (delegate* managed<<#= delegateParams#>void>)value;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator long(ManagedActionPtr<#= genericParams#> ptr) => (long)ptr.Value;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator ManagedActionPtr<#= genericParams#>(uint value) => (delegate* managed<<#= delegateParams#>void>)value;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator uint(ManagedActionPtr<#= genericParams#> ptr) => (uint)ptr.Value;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator ManagedActionPtr<#= genericParams#>(int value) => (delegate* managed<<#= delegateParams#>void>)value;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator int(ManagedActionPtr<#= genericParams#> ptr) => (int)ptr.Value;
+
+    #endregion
+}
+
+[DebuggerDisplay("{Value}")]
+public readonly unsafe struct UnmanagedActionPtr<#= genericParams#> :
+    IEquatable<UnmanagedActionPtr<#= genericParams#>>, IEqualityOperators<UnmanagedActionPtr<#= genericParams#>, UnmanagedActionPtr<#= genericParams#>, bool>, ITrueFalseOperators<UnmanagedActionPtr<#= genericParams#>>,
+
+    IZeroValue<UnmanagedActionPtr<#= genericParams#>>,
+
+    IExplicitOperators<UnmanagedActionPtr<#= genericParams#>, ManagedActionPtr<#= genericParams#>>,
+    IExplicitOperators<UnmanagedActionPtr<#= genericParams#>, nuint>, IExplicitOperators<UnmanagedActionPtr<#= genericParams#>, nint>,
+    IExplicitOperators<UnmanagedActionPtr<#= genericParams#>, ulong>, IExplicitOperators<UnmanagedActionPtr<#= genericParams#>, long>,
+    IExplicitOperators<UnmanagedActionPtr<#= genericParams#>, uint>, IExplicitOperators<UnmanagedActionPtr<#= genericParams#>, int>
+{
+    public UnmanagedActionPtr(delegate* unmanaged<<#= delegateParams#>void> value) => Value = value;
+    public readonly delegate* unmanaged<<#= delegateParams#>void> Value;
+
+    public static UnmanagedActionPtr<#= genericParams#> Zero
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => new(null);
+    }
+
+    #region Equality
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public readonly override bool Equals([NotNullWhen(true)] object? obj) => obj is UnmanagedActionPtr<#= genericParams#> other && this == other;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public readonly bool Equals(UnmanagedActionPtr<#= genericParams#> other) => this == other;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public readonly override int GetHashCode() => ((nuint)Value).GetHashCode();
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator ==(UnmanagedActionPtr<#= genericParams#> left, UnmanagedActionPtr<#= genericParams#> right) => left.Value == right.Value;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator !=(UnmanagedActionPtr<#= genericParams#> left, UnmanagedActionPtr<#= genericParams#> right) => left.Value != right.Value;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator true(UnmanagedActionPtr<#= genericParams#> ptr) => ptr.Value is not null;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool operator false(UnmanagedActionPtr<#= genericParams#> ptr) => ptr.Value is null;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public readonly override string ToString() => ((nuint)Value).ToString();
+
+    #endregion
+
+    #region Casts
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator UnmanagedActionPtr<#= genericParams#>(delegate* unmanaged<<#= delegateParams#>void> value) => new(value);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator delegate* unmanaged<<#= delegateParams#>void>(UnmanagedActionPtr<#= genericParams#> ptr) => ptr.Value;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator UnmanagedActionPtr<#= genericParams#>(void* value) => new((delegate* unmanaged<<#= delegateParams#>void>)value);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator void*(UnmanagedActionPtr<#= genericParams#> ptr) => ptr.Value;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator UnmanagedActionPtr<#= genericParams#>(ManagedActionPtr<#= genericParams#> man) => new((delegate* unmanaged<<#= delegateParams#>void>)man.Value);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator ManagedActionPtr<#= genericParams#>(UnmanagedActionPtr<#= genericParams#> unman) => new((delegate* managed<<#= delegateParams#>void>)unman.Value);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator UnmanagedActionPtr<#= genericParams#>(nuint value) => (delegate* unmanaged<<#= delegateParams#>void>)value;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator nuint(UnmanagedActionPtr<#= genericParams#> ptr) => (nuint)ptr.Value;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator UnmanagedActionPtr<#= genericParams#>(nint value) => (delegate* unmanaged<<#= delegateParams#>void>)value;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator nint(UnmanagedActionPtr<#= genericParams#> ptr) => (nint)ptr.Value;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator UnmanagedActionPtr<#= genericParams#>(ulong value) => (delegate* unmanaged<<#= delegateParams#>void>)value;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator ulong(UnmanagedActionPtr<#= genericParams#> ptr) => (ulong)ptr.Value;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator UnmanagedActionPtr<#= genericParams#>(long value) => (delegate* unmanaged<<#= delegateParams#>void>)value;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator long(UnmanagedActionPtr<#= genericParams#> ptr) => (long)ptr.Value;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator UnmanagedActionPtr<#= genericParams#>(uint value) => (delegate* unmanaged<<#= delegateParams#>void>)value;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator uint(UnmanagedActionPtr<#= genericParams#> ptr) => (uint)ptr.Value;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator UnmanagedActionPtr<#= genericParams#>(int value) => (delegate* unmanaged<<#= delegateParams#>void>)value;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static explicit operator int(UnmanagedActionPtr<#= genericParams#> ptr) => (int)ptr.Value;
+
+    #endregion
+}
+
+<#
+    for (int iConv = 0; iConv < callConvs.Length; i++)
+    {
+#>
+
+<#
+    }
+#>
+
+#endregion
+
+#region FuncPtr
+
+
+
+#endregion
+
+#endregion
+<#
+}
+#>
