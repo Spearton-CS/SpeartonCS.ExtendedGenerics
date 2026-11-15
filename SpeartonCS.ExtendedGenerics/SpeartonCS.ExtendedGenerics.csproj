@@ -38,21 +38,16 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
-    <None Include="IFactory.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>IFactory.tt</DependentUpon>
-    </None>
   </ItemGroup>
 
   <ItemGroup>
     <None Update="DuckTyping\IDeconstructible.tt">
-      <LastGenOutput>IDeconstructible.cs</LastGenOutput>
+      <LastGenOutput>IDeconstructible.g.cs</LastGenOutput>
       <Generator>TextTemplatingFileGenerator</Generator>
     </None>
     <None Update="IFactory.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>IFactory.cs</LastGenOutput>
+      <LastGenOutput>IFactory.g.cs</LastGenOutput>
     </None>
     <None Update="Runtime\CompilerServices\DelegatePtr.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
@@ -65,12 +60,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="DuckTyping\IDeconstructible.cs">
+    <Compile Update="DuckTyping\IDeconstructible.g.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>IDeconstructible.tt</DependentUpon>
     </Compile>
-    <Compile Update="IFactory.cs">
+    <Compile Update="IFactory.g.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>IFactory.tt</DependentUpon>
